@@ -47,7 +47,7 @@ class TCPing:
             while self.num_pings is None or self.num_pings > 0:
                 start_time = time.time()
 
-                ip_packet = IP(dst=ip_address, proto=4)
+                ip_packet = IP(dst=ip_address)
                 tcp_packet = TCP(dport=self.port, flags="S")
 
                 response_packet = sr1(ip_packet / tcp_packet,
@@ -58,7 +58,7 @@ class TCPing:
                 elapsed_time = end_time - start_time
 
                 if response_packet and response_packet.haslayer(TCP) and \
-                        response_packet[TCP].flags == 0x12:
+                        response_packet[TCP].flags == 18:
                     print(f'{ip_address}:{self.port} is reachable. Time={elapsed_time:.2f}ms')
                     self.stats.received_packets += 1
                     self.stats.round_trip_times.append(elapsed_time)
