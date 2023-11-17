@@ -58,7 +58,7 @@ class TCPing:
                 elapsed_time = end_time - start_time
 
                 if response_packet and response_packet.haslayer(TCP) and \
-                        response_packet[TCP].flags == 18:
+                        response_packet[TCP].flags == 0x12:
                     print(f'{ip_address}:{self.port} is reachable. Time={elapsed_time:.2f}ms')
                     self.stats.received_packets += 1
                     self.stats.round_trip_times.append(elapsed_time)
