@@ -27,7 +27,7 @@ class TestTCPing(unittest.TestCase):
     def test_run_method(self):
         targets = ['example.com:80', 'google.com:443']
         with patch('sys.argv', ['tcping.py'] + targets), \
-             patch('builtins.print') as mock_print:
+                patch('builtins.print') as mock_print:
             tcping = TCPing([])
             tcping.run()
 
@@ -36,10 +36,9 @@ class TestTCPing(unittest.TestCase):
             self.assertIsInstance(tcping.stats[target], PingStats)
             self.assertTrue(tcping.stats[target].print_stats.called)
 
-
     def test_run_method_with_keyboard_interrupt(self):
         with patch('sys.argv', ['tcping.py', 'example.com:80']), \
-             patch('builtins.print') as mock_print:
+                patch('builtins.print') as mock_print:
             tcping = TCPing([])
             with self.assertRaises(KeyboardInterrupt):
                 tcping.run()
@@ -47,5 +46,7 @@ class TestTCPing(unittest.TestCase):
         self.assertIn('example.com:80', tcping.stats)
         self.assertIsInstance(tcping.stats['example.com:80'], PingStats)
         self.assertTrue(tcping.stats['example.com:80'].print_stats.called)
+
+
 if __name__ == '__main__':
     unittest.main()
