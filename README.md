@@ -29,8 +29,9 @@
 Примеры использования:
 
 ```bash
-python tcping.py www.google.com 80
-python tcping.py 8.8.8.8 53 -n 3 -t 2 -i 1
+python tcping.py www.google.com:80
+python tcping.py 8.8.8.8:53 -n 3 -t 2 -i 1
+python tcping.py 8.8.8.8:53 8.8.4.4:53
 ```
 
 ## Автор
