@@ -1,25 +1,51 @@
 import unittest
-from unittest.mock import patch, MagicMock
+from unittest.mock import patch
+from ping_stats import PingStats
 from tcping import TCPing
 
 
 class TestTCPing(unittest.TestCase):
-    @patch('tcping.socket.gethostbyname', return_value='127.0.0.1')
-    @patch('tcping.sr1',
-           return_value=MagicMock(haslayer=MagicMock(return_value=True),
-                                  TCP=MagicMock(flags=18)))
-    @patch('tcping.time.sleep')
-    def test_run(self, mock_sleep, mock_sr1, mock_gethostbyname):
-        tcping = TCPing('example.com', 80, timeout=5, num_pings=3, interval=1)
-        tcping.run()
+    def test_initialization(self):
+        tcping = TCPing(['example.com:80', 'google.com:443'])
+        self.assertEqual(tcping.targets, ['example.com:80', 'google.com:443'])
+        self.assertEqual(tcping.timeout, 5)
+        self.assertIsNone(tcping.num_pings)
+        self.assertEqual(tcping.interval, 1)
 
-        self.assertEqual(tcping.stats.sent_packets, 3)
-        self.assertEqual(tcping.stats.received_packets, 3)
-        self.assertGreaterEqual(len(tcping.stats.round_trip_times), 3)
-        mock_gethostbyname.assert_called_once_with('example.com')
-        mock_sr1.assert_called()
-        mock_sleep.assert_called()
+    def test_parse_arguments(self):
+        args = ['example.com:80', 'google.com:443', '-n', '10', '-t', '3',
+                '-i', '2']
+        with patch('sys.argv', ['tcping.py'] + args):
+            tcping = TCPing([])
+            tcping.parse_arguments()
+
+        self.assertEqual(tcping.targets, ['example.com:80', 'google.com:443'])
+        self.assertEqual(tcping.num_pings, 10)
+        self.assertEqual(tcping.timeout, 3)
+        self.assertEqual(tcping.interval, 2)
+
+    def test_run_method(self):
+        targets = ['example.com:80', 'google.com:443']
+        with patch('sys.argv', ['tcping.py'] + targets), \
+             patch('builtins.print') as mock_print:
+            tcping = TCPing([])
+            tcping.run()
+
+        for target in targets:
+            self.assertIn(target, tcping.stats)
+            self.assertIsInstance(tcping.stats[target], PingStats)
+            self.assertTrue(tcping.stats[target].print_stats.called)
 
 
+    def test_run_method_with_keyboard_interrupt(self):
+        with patch('sys.argv', ['tcping.py', 'example.com:80']), \
+             patch('builtins.print') as mock_print:
+            tcping = TCPing([])
+            with self.assertRaises(KeyboardInterrupt):
+                tcping.run()
+
+        self.assertIn('example.com:80', tcping.stats)
+        self.assertIsInstance(tcping.stats['example.com:80'], PingStats)
+        self.assertTrue(tcping.stats['example.com:80'].print_stats.called)
 if __name__ == '__main__':
     unittest.main()
