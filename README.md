@@ -15,7 +15,7 @@
 3. Запустите скрипт из командной строки, указав целевой хост и порт:
 
     ```bash
-    python tcping_synack.py example.com 80
+    python tcping.py example.com 80
     ```
 
     Где `example.com` - это целевой хост, а `80` - порт, который вы хотите проверить.
@@ -29,8 +29,8 @@
 Примеры использования:
 
 ```bash
-python tcping_synack.py www.google.com 80
-python tcping_synack.py 8.8.8.8 53 -n 3 -t 2 -i 1
+python tcping.py www.google.com 80
+python tcping.py 8.8.8.8 53 -n 3 -t 2 -i 1
 ```
 
 ## Автор
